@@ -10,7 +10,7 @@ def PRINT(s):
   print(s)
 
 def rep(s):
-  READ(EVAL(PRINT(s)))
+  PRINT(EVAL(READ(s)))
 
 def main():
   readline.read_init_file()
