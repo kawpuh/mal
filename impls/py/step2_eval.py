@@ -43,7 +43,6 @@ def EVAL(env, ast):
       return ast
     else:
       [fn, *args] = eval_ast(env, ast)
-      print("calling ", fn, " on ", args)
       return fn(*args)
   elif type(ast) == tuple:
     return eval_ast(env, ast)
