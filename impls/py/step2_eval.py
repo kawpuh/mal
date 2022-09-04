@@ -19,17 +19,18 @@ def eval_ast(env, ast):
       except KeyError:
         raise UnboundSymbolError
     elif ast[0] == "string":
+      return ast[1]
+    elif ast[0] == "int":
+      return ast[1]
+    elif ast[0] == "[":
+      return ("[", [EVAL(env,child) for child in ast[1]])
+    elif ast[0] == "{":
+      # TODO: implement hashmap
       return ast
     else:
       raise NotImplementedError
   elif type(ast) == list:
-    if ast[0] == "(":
-      return [EVAL(env, child) for child in ast[1:]]
-    elif ast[0] == "[":
-      return ["[", *[EVAL(env,child) for child in ast[1:]]]
-    elif ast[0] == "{":
-      # TODO: implement hashmaps
-      return ast
+    return [EVAL(env, child) for child in ast]
   elif type(ast) == int:
     return ast
   assert 0
@@ -37,18 +38,15 @@ def eval_ast(env, ast):
 
 
 def EVAL(env, ast):
-  if type(ast) != list:
+  if type(ast) == list:
+    if len(ast) == 0:
+      return ast
+    else:
+      [fn, *args] = eval_ast(env, ast)
+      print("calling ", fn, " on ", args)
+      return fn(*args)
+  elif type(ast) == tuple:
     return eval_ast(env, ast)
-  elif len(ast) == 1:
-    return ast
-  elif ast[0] == "[":
-    return eval_ast(env, ast)
-  elif ast[0] == "{":
-    return eval_ast(env, ast)
-  else:
-    res = eval_ast(env, ast)
-    [fn, *args] = eval_ast(env, ast)
-    return fn(*args)
 
 def PRINT(ast):
   print(printer.pr_str(ast))

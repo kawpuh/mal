@@ -33,20 +33,22 @@ CLOSING_BRACKETS = {
 def read_list(reader):
   opening = reader.next()
   closing = CLOSING_BRACKETS[opening]
-
-  ret = [opening]
+  ret = []
   while reader.peek()[0] != closing:
     ret.append(read_form(reader))
   reader.next()
-  return ret
+
+  if opening == "(":
+    return ret
+  else:
+    return (opening, ret)
 
 def read_atom(reader):
   val = reader.next()
-  if '0' <= val[0] <= '9' or (val[0] == '-' and len(val) > 1 and '0' <= val[1] <= '9'):
-    # Could raise ValueError if invalid number literal
-    return int(val)
-
   # We're using 2-tuples as a hacky way to implement typed values as (type, val)
+  if '0' <= val[0] <= '9' or (val[0] == '-' and len(val) > 1 and '0' <= val[1] <= '9'):
+    # TODO: catch and handle ValueError if invalid number literal
+    return ("int", int(val))
   elif val[0] == '"':
     if not (val[-1] == '"' and len(val) > 1):
       raise EOFError
