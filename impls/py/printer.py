@@ -19,4 +19,5 @@ def pr_str(ast):
     else:
       raise NotImplementedError
   else:
+    # should only be a number
     return str(ast)

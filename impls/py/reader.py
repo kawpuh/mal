@@ -1,4 +1,5 @@
 import re
+
 class Reader:
   def __init__(self, tokens):
     self.tokens = tokens
@@ -41,7 +42,7 @@ def read_list(reader):
 
 def read_atom(reader):
   val = reader.next()
-  if '0' <= val[0] <= '9':
+  if '0' <= val[0] <= '9' or (val[0] == '-' and len(val) > 1 and '0' <= val[1] <= '9'):
     # Could raise ValueError if invalid number literal
     return int(val)
 
