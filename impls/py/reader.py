@@ -57,6 +57,8 @@ def read_atom(reader):
         if not (val[-1] == '"' and len(val) > 1):
             raise EOFError
         return ("string", val[1:-1])
+    elif val == "nil":
+        return None
     elif val in ("True", "False"):
         return ("bool", True if val == "True" else False)
     else:

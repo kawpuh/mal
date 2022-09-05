@@ -1,4 +1,6 @@
 def pr_str(ast):
+    if ast is None:
+        return "nil"
     if type(ast) == list:
         children = [pr_str(child) for child in ast]
         ret = "(" + " ".join(children) + ")"
