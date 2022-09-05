@@ -4,11 +4,7 @@ def pr_str(ast):
         ret = "(" + " ".join(children) + ")"
         return ret
     elif type(ast) == tuple:
-        if ast[0] == "symbol":
-            return ast[1]
-        elif ast[0] == "string":
-            return '"' + ast[1] + '"'
-        elif ast[0] == "[":
+        if ast[0] == "[":
             children = [pr_str(child) for child in ast[1]]
             return "[" + " ".join(children) + "]"
         elif ast[0] == "{":
@@ -16,6 +12,8 @@ def pr_str(ast):
             return "Unimplemented Hashmap"
         else:
             raise NotImplementedError
+    elif type(ast) == str:
+        return '"' + ast + '"'
     else:
         # should only be a number
         return str(ast)
