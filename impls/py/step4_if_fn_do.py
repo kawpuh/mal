@@ -105,8 +105,20 @@ def PRINT(ast):
     print(printer.pr_str(ast))
 
 
-def _make_variadic(fn):
+def _make_variadic_reducable(fn):
     return lambda *args: reduce(fn, args)
+
+
+def _make_variadic_compare(fn):
+    def variadic_compare(*args):
+        prev = args[0]
+        for val in args[1:]:
+            if fn(prev, val):
+                prev = val
+            else:
+                return False
+        return True
+    return variadic_compare
 
 
 repl_env = Env()
@@ -120,10 +132,15 @@ def main():
     readline.read_init_file()
 
     # Setup Environment
-    repl_env.set('+', _make_variadic(lambda a, b: a+b))
-    repl_env.set('-', _make_variadic(lambda a, b: a - b))
-    repl_env.set('*', _make_variadic(lambda a, b: a * b))
-    repl_env.set('/', _make_variadic(lambda a, b: a // b))
+    repl_env.set('+', _make_variadic_reducable(lambda a, b: a+b))
+    repl_env.set('-', _make_variadic_reducable(lambda a, b: a - b))
+    repl_env.set('*', _make_variadic_reducable(lambda a, b: a * b))
+    repl_env.set('/', _make_variadic_reducable(lambda a, b: a // b))
+    repl_env.set('=', _make_variadic_compare(lambda a, b: a == b))
+    repl_env.set('>=', _make_variadic_compare(lambda a, b: a >= b))
+    repl_env.set('<=', _make_variadic_compare(lambda a, b: a <= b))
+    repl_env.set('>', _make_variadic_compare(lambda a, b: a > b))
+    repl_env.set('<', _make_variadic_compare(lambda a, b: a < b))
     while (1):
         try:
             inp = input("user> ")
