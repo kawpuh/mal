@@ -65,14 +65,18 @@ def EVAL(env, ast):
         elif ast[0][1] == "let*":
             # TODO: vector binding
             if not len(ast) == 3:
-                print("Invalid let* form: should have 2 args (list of bindings and body)")
+                print(
+                    "Invalid let* form: should have 2 args (list of bindings and body)"
+                )
                 raise BaseException
             if not type(ast[1]) == list and len(ast[1]) % 2 == 0:
-                print("Invalid let* form: first argument should be list of binding pairs")
+                print(
+                    "Invalid let* form: first argument should be list of binding pairs"
+                )
                 raise BaseException
             sub_env = Env(env)
             for i in range(0, len(ast[1]), 2):
-                (_, symbol_name), val = ast[1][i], EVAL(sub_env, ast[1][i+1])
+                (_, symbol_name), val = ast[1][i], EVAL(sub_env, ast[1][i + 1])
                 sub_env.set(symbol_name, val)
             return EVAL(sub_env, ast[2])
         elif ast[0][1] == "do":
@@ -81,7 +85,9 @@ def EVAL(env, ast):
             return EVAL(env, ast[-1])
         elif ast[0][1] == "if":
             if len(ast) not in [3, 4]:
-                print(f"Invalid if form: Only takes 2 or 3 arguments, got {len(ast)}")
+                print(
+                    f"Invalid if form: Only takes 2 or 3 arguments, got {len(ast)}"
+                )
                 raise BaseException
             if EVAL(env, ast[1]) not in [False, None]:
                 return EVAL(env, ast[2])
@@ -110,6 +116,7 @@ def _make_variadic_reducable(fn):
 
 
 def _make_variadic_compare(fn):
+
     def variadic_compare(*args):
         prev = args[0]
         for val in args[1:]:
@@ -118,6 +125,7 @@ def _make_variadic_compare(fn):
             else:
                 return False
         return True
+
     return variadic_compare
 
 
@@ -132,7 +140,7 @@ def main():
     readline.read_init_file()
 
     # Setup Environment
-    repl_env.set('+', _make_variadic_reducable(lambda a, b: a+b))
+    repl_env.set('+', _make_variadic_reducable(lambda a, b: a + b))
     repl_env.set('-', _make_variadic_reducable(lambda a, b: a - b))
     repl_env.set('*', _make_variadic_reducable(lambda a, b: a * b))
     repl_env.set('/', _make_variadic_reducable(lambda a, b: a // b))
