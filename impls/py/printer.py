@@ -16,6 +16,8 @@ def pr_str(ast):
             raise NotImplementedError
     elif type(ast) == str:
         return '"' + ast + '"'
+    elif type(ast) == bool:
+        return "true" if ast is True else "false"
     else:
         # should only be a number
         return str(ast)

@@ -59,8 +59,8 @@ def read_atom(reader):
         return ("string", val[1:-1])
     elif val == "nil":
         return None
-    elif val in ("True", "False"):
-        return ("bool", True if val == "True" else False)
+    elif val in ("true", "false"):
+        return ("bool", True if val == "true" else False)
     else:
         return ("symbol", val)
 
