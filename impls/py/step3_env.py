@@ -1,7 +1,7 @@
 import readline
 import reader
 import printer
-from env import Env, UnboundSymbolError
+from mal_types import Env, UnboundSymbolError
 from functools import reduce
 
 

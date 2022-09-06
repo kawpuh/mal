@@ -1,5 +1,5 @@
 from functools import reduce
-from env import Env
+from mal_types import Env
 
 
 def _make_variadic_reducable(fn):

@@ -1,14 +1,14 @@
 import readline
 import reader
 import printer
-from env import Env
 from core import core_env
+import mal_types
 
 
 # TODO: replace err handling
 def err(msg):
     print("ERR: ", msg)
-    raise BaseException
+    raise mal_types.MalError
 
 
 def is_symbol(val):
@@ -21,30 +21,24 @@ def is_symbol(val):
 def eval_ast(env, ast):
     if ast is None:
         return None
-    if type(ast) == tuple:
-        mal_type, val = ast
-        if mal_type == "symbol":
-            return env.get(val)
-        elif mal_type == "string":
-            return val
-        elif mal_type == "int":
-            return val
-        elif mal_type == "bool":
-            return val
-        elif mal_type == "[":
-            return ("[", [EVAL(env, child) for child in val])
-        elif mal_type == "{":
-            # TODO: implement hashmap
-            return ast
-        else:
-            err(f"can't eval_ast given mal_type: {mal_type}")
-
-    elif type(ast) == list:
+    if type(ast) is mal_types.Symbol:
+        return env.get(ast.name)
+    if type(ast) in (str, int, bool):
+        return ast
+    if type(ast) is list:
         return [EVAL(env, child) for child in ast]
+    if type(ast) is dict:
+        return dict(
+            zip((EVAL(env, key) for key in ast.keys()),
+                (EVAL(env, val) for val in ast.values())))
+
+    if type(ast) is mal_types.List:
+        return [EVAL(env, child) for child in ast.data]
 
     elif type(ast) == int:
         return ast
-    assert 0
+
+    err(f"can't eval_ast given mal_type: {type(ast)}")
 
 
 def READ(s):
@@ -55,55 +49,54 @@ def READ(s):
 
 
 def EVAL(env, ast):
-    if type(ast) == tuple:
+    if type(ast) in (mal_types.Symbol, str, int, bool, list, dict):
         return eval_ast(env, ast)
-    if type(ast) == list:
+    if type(ast) == mal_types.List:
         if len(ast) == 0:
             return ast
-        if ast[0][1] == "def!":
-            if not is_symbol(ast[1]):
+        if type(ast[0]) is not mal_types.Symbol:
+            err("ERR: can't evaluate list beginning with non-symbol")
+        if ast[0].name == "def!":
+            if type(ast[1]) is not mal_types.Symbol:
                 err("Invalid defn! form: Can only assign to symbol")
-            return env.set(ast[1][1], EVAL(env, ast[2]))
-        elif ast[0][1] == "let*":
+            return env.set(ast[1].name, EVAL(env, ast[2]))
+        elif ast[0].name == "let*":
             # TODO: vector binding
             if not len(ast) == 3:
-                err(
-                    "Invalid let* form: should have 2 args (list of bindings and body)"
-                )
-            if not type(ast[1]) == list and len(ast[1]) % 2 == 0:
-                err(
-                    "Invalid let* form: first argument should be list of binding pairs"
-                )
-            sub_env = Env(env)
+                err("Invalid let* form: should have 2 args (list of bindings and body)"
+                    )
+            if not (type(ast[1]) in [list, mal_types.List]
+                    and len(ast[1]) % 2 == 0):
+                err("Invalid let* form: first argument should be list of binding pairs"
+                    )
+            sub_env = mal_types.Env(env)
             for i in range(0, len(ast[1]), 2):
-                (_, symbol_name), val = ast[1][i], EVAL(sub_env, ast[1][i + 1])
-                sub_env.set(symbol_name, val)
+                symbol, val = ast[1][i], EVAL(sub_env, ast[1][i + 1])
+                sub_env.set(symbol.name, val)
             return EVAL(sub_env, ast[2])
-        elif ast[0][1] == "do":
+        elif ast[0].name == "do":
             for body in ast[1:-1]:
                 EVAL(env, body)
             return EVAL(env, ast[-1])
-        elif ast[0][1] == "if":
+        elif ast[0].name == "if":
             if len(ast) not in [3, 4]:
-                err(
-                    f"Invalid if form: Only takes 2 or 3 arguments, got {len(ast)}"
-                )
+                err(f"Invalid if form: Only takes 2 or 3 arguments, got {len(ast)}"
+                    )
             if EVAL(env, ast[1]) not in [False, None]:
                 return EVAL(env, ast[2])
             elif len(ast) == 4:
                 return EVAL(env, ast[3])
             else:
                 return None
-        elif ast[0][1] == "fn*":
+        elif ast[0].name == "fn*":
             keys = ast[1]
             if type(keys) == tuple and keys[0][0] == "[":
                 keys = keys[1]
-            return lambda *args: EVAL(Env(env, add_binds=(keys, args)), ast[2])
+            return lambda *args: EVAL(mal_types.Env(env, add_binds=(keys, args)), ast[2])
         else:
             [fn, *args] = eval_ast(env, ast)
             return fn(*args)
-    print("Couldn't EVAL ast")
-    return BaseException
+    err("Couldn't EVAL ast")
 
 
 def PRINT(ast):
@@ -126,7 +119,7 @@ def main():
         readline.add_history(inp)
         try:
             rep(core_env, inp)
-        except BaseException:
+        except mal_types.MalError:
             print("Continuing...")
 
 

@@ -1,4 +1,5 @@
 import re
+import mal_types
 
 
 class Reader:
@@ -32,7 +33,7 @@ OPENING_BRACKETS = ("(", "[", "{")
 CLOSING_BRACKETS = {"(": ")", "[": "]", "{": "}"}
 
 
-def read_list(reader):
+def read_bracketed(reader):
     opening = reader.next()
     closing = CLOSING_BRACKETS[opening]
     ret = []
@@ -41,33 +42,40 @@ def read_list(reader):
     reader.next()
 
     if opening == "(":
+        return mal_types.List(ret)
+    if opening == "[":
         return ret
-    else:
-        return (opening, ret)
+    else:  # opening "{"
+        if len(ret) % 2 == 0:
+            print("ERR: hashmap literal with non-even number of forms")
+            raise BaseException
+        hm = dict()
+        for key, val in ret:
+            hm[key] = val
+        return hm
 
 
 def read_atom(reader):
     val = reader.next()
-    # We're using 2-tuples as a hacky way to implement typed values as (type, val)
     if '0' <= val[0] <= '9' or (val[0] == '-' and len(val) > 1
                                 and '0' <= val[1] <= '9'):
         # TODO: catch and handle ValueError if invalid number literal
-        return ("int", int(val))
+        return int(val)
     elif val[0] == '"':
         if not (val[-1] == '"' and len(val) > 1):
             raise EOFError
-        return ("string", val[1:-1])
+        return val[1:-1]
     elif val == "nil":
         return None
     elif val in ("true", "false"):
-        return ("bool", True if val == "true" else False)
+        return True if val == "true" else False
     else:
-        return ("symbol", val)
+        return mal_types.Symbol(val)
 
 
 def read_form(reader):
     if reader.peek()[0] in OPENING_BRACKETS:
-        return read_list(reader)
+        return read_bracketed(reader)
     else:
         return read_atom(reader)
 
@@ -75,4 +83,3 @@ def read_form(reader):
 def read_str(s):
     reader = Reader(tokenize(s))
     return read_form(reader)
-    # return tokenize(s)
