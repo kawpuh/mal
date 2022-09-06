@@ -48,7 +48,7 @@ def read_bracketed(reader):
     else:  # opening "{"
         if len(ret) % 2 == 0:
             print("ERR: hashmap literal with non-even number of forms")
-            raise BaseException
+            raise mal_types.MalError
         hm = dict()
         for key, val in ret:
             hm[key] = val
@@ -59,8 +59,11 @@ def read_atom(reader):
     val = reader.next()
     if '0' <= val[0] <= '9' or (val[0] == '-' and len(val) > 1
                                 and '0' <= val[1] <= '9'):
-        # TODO: catch and handle ValueError if invalid number literal
-        return int(val)
+        try:
+            return int(val)
+        except ValueError:
+            print(f"Invalid number literal: {str(val)}")
+            raise mal_types.MalError
     elif val[0] == '"':
         if not (val[-1] == '"' and len(val) > 1):
             raise EOFError
