@@ -1,8 +1,14 @@
 import readline
 import reader
 import printer
-from env import Env, UnboundSymbolError
+from env import Env
 from functools import reduce
+
+
+# TODO: replace err handling
+def err(msg):
+    print("ERR: ", msg)
+    raise BaseException
 
 
 def is_symbol(val):
@@ -18,10 +24,7 @@ def eval_ast(env, ast):
     if type(ast) == tuple:
         mal_type, val = ast
         if mal_type == "symbol":
-            try:
-                return env.get(val)
-            except KeyError:
-                raise UnboundSymbolError
+            return env.get(val)
         elif mal_type == "string":
             return val
         elif mal_type == "int":
@@ -34,7 +37,7 @@ def eval_ast(env, ast):
             # TODO: implement hashmap
             return ast
         else:
-            raise NotImplementedError
+            err(f"can't eval_ast given mal_type: {mal_type}")
 
     elif type(ast) == list:
         return [EVAL(env, child) for child in ast]
@@ -52,28 +55,25 @@ def READ(s):
 
 
 def EVAL(env, ast):
-    # TODO: Replace BaseException with proper exceptions
+    if type(ast) == tuple:
+        return eval_ast(env, ast)
     if type(ast) == list:
         if len(ast) == 0:
             return ast
-
         if ast[0][1] == "def!":
             if not is_symbol(ast[1]):
-                print("Invalid defn! form: Can only assign to symbol")
-                raise BaseException
+                err("Invalid defn! form: Can only assign to symbol")
             return env.set(ast[1][1], EVAL(env, ast[2]))
         elif ast[0][1] == "let*":
             # TODO: vector binding
             if not len(ast) == 3:
-                print(
+                err(
                     "Invalid let* form: should have 2 args (list of bindings and body)"
                 )
-                raise BaseException
             if not type(ast[1]) == list and len(ast[1]) % 2 == 0:
-                print(
+                err(
                     "Invalid let* form: first argument should be list of binding pairs"
                 )
-                raise BaseException
             sub_env = Env(env)
             for i in range(0, len(ast[1]), 2):
                 (_, symbol_name), val = ast[1][i], EVAL(sub_env, ast[1][i + 1])
@@ -85,10 +85,9 @@ def EVAL(env, ast):
             return EVAL(env, ast[-1])
         elif ast[0][1] == "if":
             if len(ast) not in [3, 4]:
-                print(
+                err(
                     f"Invalid if form: Only takes 2 or 3 arguments, got {len(ast)}"
                 )
-                raise BaseException
             if EVAL(env, ast[1]) not in [False, None]:
                 return EVAL(env, ast[2])
             elif len(ast) == 4:
@@ -103,8 +102,8 @@ def EVAL(env, ast):
         else:
             [fn, *args] = eval_ast(env, ast)
             return fn(*args)
-    elif type(ast) == tuple:
-        return eval_ast(env, ast)
+    print("Couldn't EVAL ast")
+    return BaseException
 
 
 def PRINT(ast):
@@ -158,10 +157,8 @@ def main():
         readline.add_history(inp)
         try:
             rep(inp)
-        except UnboundSymbolError:
-            print("Referenced Unbound Symbol\n")
-        # except BaseException:
-        #     print("TODO error")
+        except BaseException:
+            print("Continuing...")
 
 
 if __name__ == "__main__":

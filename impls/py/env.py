@@ -1,9 +1,9 @@
-class UnboundSymbolError(BaseException):
+class NotFound:
     pass
 
 
 class Env:
-    def __init__(self, outer={}, add_binds=None):
+    def __init__(self, outer=None, add_binds=None):
         self.outer = outer
         self.data = {}
 
@@ -17,10 +17,14 @@ class Env:
         return v
 
     def get(self, k):
-        inner_val = self.data.get(k)
-        if inner_val is not None:
+        inner_val = self.data.get(k, NotFound)
+        if inner_val is not NotFound:
             return inner_val
-        elif self.outer.get(k) is not None:
-            return self.outer.get(k)
-        else:
-            raise UnboundSymbolError
+
+        if self.outer is not None:
+            outer_val = self.outer.get(k, NotFound)
+            if outer_val is not NotFound:
+                return outer_val
+
+        print(f"ERR: Binding for {k} not found")
+        raise BaseException
