@@ -19,24 +19,16 @@ def is_symbol(val):
 
 
 def eval_ast(env, ast):
-    if ast is None:
-        return None
     if type(ast) is mal_types.Symbol:
         return env.get(ast.name)
-    if type(ast) in (str, int, bool):
-        return ast
     if type(ast) is list:
         return [EVAL(env, child) for child in ast]
     if type(ast) is dict:
         return dict(
             zip((EVAL(env, key) for key in ast.keys()),
                 (EVAL(env, val) for val in ast.values())))
-
     if type(ast) is mal_types.List:
         return [EVAL(env, child) for child in ast.data]
-
-    elif type(ast) == int:
-        return ast
 
     err(f"can't eval_ast given mal_type: {type(ast)}")
 
@@ -49,7 +41,9 @@ def READ(s):
 
 
 def EVAL(env, ast):
-    if type(ast) in (mal_types.Symbol, str, int, bool, list, dict):
+    if type(ast) in (str, int, bool, type(None)):
+        return ast
+    if type(ast) in (mal_types.Symbol, list, dict):
         return eval_ast(env, ast)
     if type(ast) == mal_types.List:
         if len(ast) == 0:
