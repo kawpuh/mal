@@ -54,8 +54,11 @@ def EVAL(env, ast):
     if type(ast) == mal_types.List:
         if len(ast) == 0:
             return ast
+        if type(ast[0]) is mal_types.List:
+            [fn, *args] = eval_ast(env, ast)
+            return fn(*args)
         if type(ast[0]) is not mal_types.Symbol:
-            err("ERR: can't evaluate list beginning with non-symbol")
+            err("ERR: can only evaluate list beginning with symbol or function")
         if ast[0].name == "def!":
             if type(ast[1]) is not mal_types.Symbol:
                 err("Invalid defn! form: Can only assign to symbol")
