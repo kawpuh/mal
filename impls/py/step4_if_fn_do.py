@@ -41,7 +41,7 @@ def READ(s):
 
 
 def EVAL(env, ast):
-    if type(ast) in (str, int, bool, type(None)):
+    if type(ast) in (str, int, bool, type(None), mal_types.Keyword):
         return ast
     if type(ast) in (mal_types.Symbol, list, dict):
         return eval_ast(env, ast)

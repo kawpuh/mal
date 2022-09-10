@@ -68,6 +68,8 @@ def read_atom(reader):
         if not (val[-1] == '"' and len(val) > 1):
             raise EOFError
         return val[1:-1]
+    elif val[0] == ":":
+        return mal_types.Keyword(val[1:])
     elif val == "nil":
         return None
     elif val in ("true", "false"):
