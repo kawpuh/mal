@@ -41,11 +41,12 @@ pre = {
     _make_variadic_compare(lambda a, b: a > b),
     mal_types.Symbol('<'):
     _make_variadic_compare(lambda a, b: a < b),
+
     mal_types.Symbol("pr-str"):
     lambda *args: " ".join(printer.pr_str(arg) for arg in args),
     mal_types.Symbol("str"):
     lambda *args: "".join(printer.pr_str(arg, False) for arg in args),
-    mal_types.Symbol("println"):
+    mal_types.Symbol("prn"):
     lambda *args: print(*args),
     mal_types.Symbol("list"):
     lambda *args: mal_types.List(args),
