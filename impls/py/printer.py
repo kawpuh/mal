@@ -13,6 +13,10 @@ def pr_str(ast, print_readable=True):
         children = [pr_str(child) for child in ast]
         ret = "(" + " ".join(children) + ")"
         return ret
+    if type(ast) is mal_types.MalFunction:
+        return "MalFunction: " + pr_str(ast.params) + " -> " + pr_str(ast.ast)
+    if type(ast) is mal_types.Symbol:
+        return ast.name
     if type(ast) is mal_types.Keyword:
         return ":" + ast.name
     if type(ast) == str:

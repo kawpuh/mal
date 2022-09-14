@@ -10,8 +10,8 @@ class List:
         return self.data[n]
 
     def __eq__(self, o):
-        if not (getattr(o, "__getitem__", False) and getattr(
-                o, "__len__", False)):
+        if not (getattr(o, "__getitem__", False)
+                and getattr(o, "__len__", False)):
             return False
         if len(self) != len(o):
             return False
@@ -77,3 +77,12 @@ class Env:
 
         print(f"ERR: Binding for {k} not found")
         raise MalError
+
+
+class MalFunction:
+
+    def __init__(self, ast, params, env, ogfn):
+        self.ast = ast
+        self.params = params
+        self.env = env
+        self.ogfn = ogfn
