@@ -6,15 +6,17 @@ def pr_str(ast, print_readable=True):
     if ast is None:
         return "nil"
     if type(ast) is list:
-        children = [pr_str(child) for child in ast]
+        children = [pr_str(child, print_readable) for child in ast]
         ret = "[" + " ".join(children) + "]"
         return ret
     if type(ast) is mal_types.List:
-        children = [pr_str(child) for child in ast]
+        children = [pr_str(child, print_readable) for child in ast]
         ret = "(" + " ".join(children) + ")"
         return ret
     if type(ast) is mal_types.MalFunction:
-        return "MalFunction: " + pr_str(ast.params) + " -> " + pr_str(ast.ast)
+        return "MalFunction: " + pr_str(ast.params,
+                                        print_readable) + " -> " + pr_str(
+                                            ast.ast, print_readable)
     if type(ast) is mal_types.Symbol:
         return ast.name
     if type(ast) is mal_types.Keyword:

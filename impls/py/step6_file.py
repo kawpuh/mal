@@ -85,7 +85,7 @@ def EVAL(env, ast):
                 continue
             elif ast[0].name == "if":
                 if len(ast) not in [3, 4]:
-                    err(f"Invalid if form: Only takes 2 or 3 arguments, got {len(ast)}"
+                    err(f"Invalid if form: Only takes 2 or 3 arguments, got {len(ast)-1}"
                         )
                 if EVAL(env, ast[1]) not in [False, None]:
                     ast = ast[2]
@@ -102,6 +102,13 @@ def EVAL(env, ast):
                 return mal_types.MalFunction(
                     ast[2], keys, env, lambda *args: EVAL(
                         mal_types.Env(env, add_binds=(keys, args)), ast[2]))
+            elif ast[0].name == "eval":
+                if len(ast) != 2:
+                    err(f"Invalid eval form: expected 1 argument, ast, got {len(ast)-1}"
+                        )
+                ast = EVAL(mal_types.Env(env), ast[1])
+                # print(f"new ast: {ast}")
+                continue
             elif type(ast[0]) is mal_types.Symbol:
                 [fn_obj, *args] = eval_ast(env, ast)
                 if type(fn_obj) is mal_types.MalFunction:

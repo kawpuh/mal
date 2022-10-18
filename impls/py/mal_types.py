@@ -20,12 +20,16 @@ class List:
                 return False
         return True
 
+    def __str__(self):
+        return "MalList: (" + " ".join(str(item) for item in self.data) + ")"
 
 class Symbol:
 
     def __init__(self, name):
         self.name = name
 
+    def __str__(self):
+        return "MalSymbol: " + self.name
 
 class Keyword:
 

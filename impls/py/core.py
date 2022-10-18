@@ -2,6 +2,7 @@ from functools import reduce
 import mal_types
 from mal_types import Env
 import printer
+import reader
 
 
 def _make_variadic_reducable(fn):
@@ -20,6 +21,12 @@ def _make_variadic_compare(fn):
         return True
 
     return variadic_compare
+
+
+def slurp(fname):
+    with open(fname, "r") as f:
+        # TODO: string escaping?
+        return f.read()
 
 
 pre = {
@@ -41,7 +48,6 @@ pre = {
     _make_variadic_compare(lambda a, b: a > b),
     mal_types.Symbol('<'):
     _make_variadic_compare(lambda a, b: a < b),
-
     mal_types.Symbol("pr-str"):
     lambda *args: " ".join(printer.pr_str(arg) for arg in args),
     mal_types.Symbol("str"):
@@ -56,5 +62,9 @@ pre = {
     lambda l: True if l is None else len(l) == 0,
     mal_types.Symbol("count"):
     lambda l: 0 if l is None or not getattr(l, "__len__", False) else len(l),
+    mal_types.Symbol("read-string"): # TODO: string escaping?
+    lambda s: reader.read_str(s),
+    mal_types.Symbol("slurp"):
+    slurp
 }
 core_env = Env(add_binds=pre)
