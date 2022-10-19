@@ -89,7 +89,7 @@ def EVAL(env, ast):
                 if len(ast) not in [3, 4]:
                     err(f"Invalid if form: Only takes 2 or 3 arguments, got {len(ast)-1}"
                         )
-                if EVAL(env, ast[1]) not in [False, None]:
+                if mal_types.is_true(EVAL(env, ast[1])):
                     ast = ast[2]
                     continue
                 elif len(ast) == 4:
@@ -135,7 +135,7 @@ def rep(env, s):
 
 def main():
     readline.read_init_file()
-
+    EVAL(core_env, READ("(def! not (fn* (a) (if a false true)))"))
     while (1):
         try:
             inp = input("user> ")
