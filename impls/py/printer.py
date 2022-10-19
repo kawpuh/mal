@@ -9,6 +9,10 @@ def pr_str(ast, print_readable=True):
         children = [pr_str(child, print_readable) for child in ast]
         ret = "[" + " ".join(children) + "]"
         return ret
+    if type(ast) is dict:
+        children = [pr_str(k, print_readable) + " " + pr_str(v, print_readable) for k,v in ast.items()]
+        ret = "{" + " ".join(children) + "}"
+        return ret
     if type(ast) is mal_types.List:
         children = [pr_str(child, print_readable) for child in ast]
         ret = "(" + " ".join(children) + ")"
@@ -22,14 +26,17 @@ def pr_str(ast, print_readable=True):
     if type(ast) is mal_types.Keyword:
         return ":" + ast.name
     if type(ast) == str:
-        return '"' + ast + '"' if print_readable is True else ast
+        if print_readable:
+            # When print_readably is true, doublequotes, newlines, and backslashes are translated into their printed representations (the reverse of the reader)
+            ast.replace("\\", "\\\\")
+            ast.replace("\n", "\\n")
+            ast.replace("\"", "\\\"")
+            return '"' + ast + '"'
+        return ast
     if type(ast) == bool:
         return "true" if ast is True else "false"
-    if type(ast) is dict:
-        return str(ast)
     if type(ast) is int:
         return str(ast)
-
     if type(ast) is function:
         return str()
     print("Can't print: ", type(ast))

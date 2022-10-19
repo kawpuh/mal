@@ -52,6 +52,8 @@ def EVAL(env, ast):
                 return ast
             if type(ast[0]) is mal_types.List:
                 [fn_obj, *args] = eval_ast(env, ast)
+                if not type(fn_obj) is mal_types.MalFunction:
+                    err("ERR: first item in evaluated list must be function")
                 ast = fn_obj.ast
                 env = mal_types.Env(fn_obj.env, (fn_obj.params, args))
                 continue
@@ -124,7 +126,7 @@ def EVAL(env, ast):
 
 
 def PRINT(ast):
-    print(printer.pr_str(ast))
+    print(printer.pr_str(ast, True))
 
 
 def rep(env, s):

@@ -39,6 +39,9 @@ class Keyword:
     def __eq__(self, o):
         return type(o) is type(self) and self.name == o.name
 
+    def __hash__(self):
+        return self.name.__hash__()
+
 
 class MalError(BaseException):
     pass

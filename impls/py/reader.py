@@ -46,11 +46,11 @@ def read_bracketed(reader):
     if opening == "[":
         return ret
     else:  # opening "{"
-        if len(ret) % 2 == 0:
-            print("ERR: hashmap literal with non-even number of forms")
+        if not len(ret) % 2 == 0:
+            print(f"ERR: hashmap literal with non-even number of forms ({len(ret)})")
             raise mal_types.MalError
         hm = dict()
-        for key, val in ret:
+        for key, val in zip(ret[:1:], ret[1:]):
             hm[key] = val
         return hm
 
@@ -67,7 +67,15 @@ def read_atom(reader):
     elif val[0] == '"':
         if not (val[-1] == '"' and len(val) > 1):
             raise EOFError
-        return val[1:-1]
+        ret = val[1:-1]
+        # When a string is read, the following transformations are applied:
+        # a backslash followed by a doublequote is translated into a plain doublequote character
+        ret.replace("\\\"", "\"")
+        # a backslash followed by "n" is translated into a newline
+        ret.replace("\\\n", "\n")
+        # a backslash followed by another backslash is translated into a single backslash.
+        ret.replace("\\\\", "\\")
+        return ret
     elif val[0] == ":":
         return mal_types.Keyword(val[1:])
     elif val == "nil":
