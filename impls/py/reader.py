@@ -72,7 +72,7 @@ def read_atom(reader):
         # a backslash followed by a doublequote is translated into a plain doublequote character
         ret = ret.replace("\\\"", "\"")
         # a backslash followed by "n" is translated into a newline
-        ret = ret.replace("\\\n", "\n")
+        ret = ret.replace("\\n", "\n")
         # a backslash followed by another backslash is translated into a single backslash.
         ret = ret.replace("\\\\", "\\")
         return ret

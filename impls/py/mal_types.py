@@ -93,3 +93,11 @@ class MalFunction:
         self.params = params
         self.env = env
         self.ogfn = ogfn
+
+
+def is_true(val):
+    if type(val) is bool and val == False:
+        return False
+    if val is None:
+        return False
+    return True
