@@ -28,9 +28,9 @@ def pr_str(ast, print_readable=True):
     if type(ast) == str:
         if print_readable:
             # When print_readably is true, doublequotes, newlines, and backslashes are translated into their printed representations (the reverse of the reader)
-            ast.replace("\\", "\\\\")
-            ast.replace("\n", "\\n")
-            ast.replace("\"", "\\\"")
+            ast = ast.replace("\\", "\\\\")
+            ast = ast.replace("\n", "\\n")
+            ast = ast.replace("\"", "\\\"")
             return '"' + ast + '"'
         return ast
     if type(ast) == bool:

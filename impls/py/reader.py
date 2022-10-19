@@ -70,11 +70,11 @@ def read_atom(reader):
         ret = val[1:-1]
         # When a string is read, the following transformations are applied:
         # a backslash followed by a doublequote is translated into a plain doublequote character
-        ret.replace("\\\"", "\"")
+        ret = ret.replace("\\\"", "\"")
         # a backslash followed by "n" is translated into a newline
-        ret.replace("\\\n", "\n")
+        ret = ret.replace("\\\n", "\n")
         # a backslash followed by another backslash is translated into a single backslash.
-        ret.replace("\\\\", "\\")
+        ret = ret.replace("\\\\", "\\")
         return ret
     elif val[0] == ":":
         return mal_types.Keyword(val[1:])

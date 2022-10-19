@@ -49,11 +49,13 @@ pre = {
     mal_types.Symbol('<'):
     _make_variadic_compare(lambda a, b: a < b),
     mal_types.Symbol("pr-str"):
-    lambda *args: " ".join(printer.pr_str(arg) for arg in args),
+    lambda *args: " ".join(printer.pr_str(arg, True) for arg in args),
     mal_types.Symbol("str"):
     lambda *args: "".join(printer.pr_str(arg, False) for arg in args),
     mal_types.Symbol("prn"):
-    lambda *args: print(*args),
+    lambda *args: print(" ".join(printer.pr_str(arg, True) for arg in args)),
+    mal_types.Symbol("println"):
+    lambda *args: print(" ".join(printer.pr_str(arg, False) for arg in args)),
     mal_types.Symbol("list"):
     lambda *args: mal_types.List(args),
     mal_types.Symbol("list?"):
