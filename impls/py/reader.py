@@ -69,12 +69,12 @@ def read_atom(reader):
             raise EOFError
         ret = val[1:-1]
         # When a string is read, the following transformations are applied:
-        # a backslash followed by a doublequote is translated into a plain doublequote character
-        ret = ret.replace("\\\"", "\"")
-        # a backslash followed by "n" is translated into a newline
-        ret = ret.replace("\\n", "\n")
-        # a backslash followed by another backslash is translated into a single backslash.
-        ret = ret.replace("\\\\", "\\")
+        # # a backslash followed by another backslash is translated into a single backslash.
+        # # a backslash followed by a doublequote is translated into a plain doublequote character
+        # # a backslash followed by "n" is translated into a newline
+        ret = re.sub("(?<!\\\\)\\\\n", "\n", ret)
+        ret = re.sub("(?<!\\\\)\\\\\"", "\"", ret)
+        ret = re.sub("\\\\\\\\", "\\\\", ret)
         return ret
     elif val[0] == ":":
         return mal_types.Keyword(val[1:])
